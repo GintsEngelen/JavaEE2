@@ -3,6 +3,7 @@ package client;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
+import javax.naming.InitialContext;
 import rental.CarType;
 import rental.Reservation;
 import session.CarRentalSessionRemote;
@@ -15,12 +16,14 @@ public class Main extends AbstractTestManagement<CarRentalSessionRemote, Manager
     }
 
     public static void main(String[] args) throws Exception {     
+        Main main = new Main("trips");
+        ManagerSessionRemote ms = main.getNewManagerSession("root");
         
+        ms.persistRental("hertz.csv");
+        ms.persistRental("dockx.csv");
         
-        new Main("trips").run();
+        main.run();
     }
-    
-    
 
     @Override
     protected Set<String> getBestClients(ManagerSessionRemote ms) throws Exception {
@@ -37,14 +40,19 @@ public class Main extends AbstractTestManagement<CarRentalSessionRemote, Manager
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
+
     @Override
     protected CarRentalSessionRemote getNewReservationSession(String name) throws Exception {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        //PAY ATTENTION TO MEEEEEEEEE
+        //Where does the RentalSession come from? Do we need to add its name manually?
+        InitialContext context = new InitialContext();
+        return (CarRentalSessionRemote) context.lookup(CarRentalSessionRemote.class.getName());
     }
 
     @Override
     protected ManagerSessionRemote getNewManagerSession(String name) throws Exception {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        InitialContext context = new InitialContext();
+        return (ManagerSessionRemote) context.lookup(ManagerSessionRemote.class.getName());
     }
 
     @Override

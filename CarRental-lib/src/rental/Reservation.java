@@ -3,7 +3,6 @@ package rental;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-import javax.persistence.ManyToOne;
 
 @Entity
 public class Reservation extends Quote {
@@ -11,7 +10,6 @@ public class Reservation extends Quote {
     @Id @GeneratedValue
     private int reservationId;
     
-    @ManyToOne
     private int carId;
     
     /***************

@@ -75,8 +75,9 @@ public class ManagerSession implements ManagerSessionRemote {
         return out.size();
     }
 
-
+    @Override
     public void persistRental(String datafile) {
+        // Should the csv be stored locally, or at the server side? 
         try {
             CrcData data = loadData(datafile);
             CarRentalCompany company = new CarRentalCompany(data.name, data.regions, data.cars);
@@ -90,7 +91,7 @@ public class ManagerSession implements ManagerSessionRemote {
 
     }
 
-    public CrcData loadData(String datafile)
+    private CrcData loadData(String datafile)
             throws NumberFormatException, IOException {
 
         CrcData out = new CrcData();

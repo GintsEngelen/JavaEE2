@@ -22,10 +22,10 @@ public class CarRentalCompany {
     @Id
     private String name;
     
-    @OneToMany(cascade=ALL, mappedBy="carRentalCompany")
+    @OneToMany(cascade=ALL)
     private List<Car> cars;
     
-    @OneToMany(cascade=ALL, mappedBy="carRentalCompany")
+    @OneToMany(cascade=ALL)
     private Set<CarType> carTypes = new HashSet<CarType>();
     private List<String> regions;
 
@@ -34,6 +34,8 @@ public class CarRentalCompany {
      * CONSTRUCTOR *
      ***************/
 
+    public CarRentalCompany(){}
+    
     public CarRentalCompany(String name, List<String> regions, List<Car> cars) {
         logger.log(Level.INFO, "<{0}> Starting up CRC {0} ...", name);
         setName(name);

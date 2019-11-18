@@ -18,12 +18,14 @@ public class Car {
     @ManyToOne
     private CarType type;
     
-    @OneToMany(cascade=REMOVE, mappedBy="car")
+    @OneToMany(cascade=REMOVE)
     private Set<Reservation> reservations;
 
     /***************
      * CONSTRUCTOR *
      ***************/
+    
+    public Car(){}
     
     public Car(int uid, CarType type) {
     	this.id = uid;

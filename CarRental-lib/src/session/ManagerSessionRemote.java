@@ -16,4 +16,5 @@ public interface ManagerSessionRemote {
     
     public int getNumberOfReservations(String company, String type);
       
+    public void persistRental(String datafile);
 }
