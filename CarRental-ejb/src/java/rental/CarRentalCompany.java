@@ -9,10 +9,27 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import static javax.persistence.CascadeType.ALL;
-import static javax.persistence.CascadeType.REMOVE;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
+
+@NamedQueries({
+    @NamedQuery(name="getAllCompanies", query="SELECT c.name FROM CarRentalCompany c"),
+    
+    @NamedQuery(name = "getAvailableCarTypes", query
+            = "SELECT DISTINCT c.type FROM Car c WHERE c.id NOT IN ("
+            + "  SELECT r.carId "
+            + "  FROM Reservation r "
+            + "  WHERE (:startDateInput BETWEEN r.startDate AND r.endDate) "
+            + "      OR (:endDateInput BETWEEN r.startDate AND r.endDate)"
+            + "  ) " 
+    ),
+    
+    
+    
+})
 
 @Entity
 public class CarRentalCompany {

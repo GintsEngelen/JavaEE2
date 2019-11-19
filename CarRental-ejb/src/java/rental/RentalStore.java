@@ -1,4 +1,4 @@
-package rental;
+/*package rental;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -94,3 +94,4 @@ public class RentalStore {
             public List<String> regions =  new LinkedList<String>();
     }
 }
+*/

@@ -6,6 +6,7 @@ import java.util.Set;
 import javax.naming.InitialContext;
 import rental.CarType;
 import rental.Reservation;
+import rental.ReservationConstraints;
 import session.CarRentalSessionRemote;
 import session.ManagerSessionRemote;
 
@@ -22,7 +23,7 @@ public class Main extends AbstractTestManagement<CarRentalSessionRemote, Manager
         ms.persistRental("hertz.csv");
         ms.persistRental("dockx.csv");
         
-        main.run();
+        //main.run();
     }
 
     @Override
@@ -61,13 +62,15 @@ public class Main extends AbstractTestManagement<CarRentalSessionRemote, Manager
     }
 
     @Override
-    protected void createQuote(CarRentalSessionRemote session, String name, Date start, Date end, String carType, String region) throws Exception {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    protected void createQuote(CarRentalSessionRemote session, String company, Date start, Date end, String carType, String region) throws Exception {
+        ReservationConstraints constraints = new ReservationConstraints(start, end, carType, region);
+        session.createQuote(company, constraints);
     }
 
     @Override
     protected List<Reservation> confirmQuotes(CarRentalSessionRemote session, String name) throws Exception {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        //TODO: Is this name necessary?
+        return session.confirmQuotes();
     }
 
     @Override
