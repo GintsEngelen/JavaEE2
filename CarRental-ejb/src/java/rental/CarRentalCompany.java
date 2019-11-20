@@ -27,7 +27,16 @@ import javax.persistence.OneToMany;
             + "  ) " 
     ),
     
-    
+    @NamedQuery(name = "getCheapestCarType", query
+            = "SELECT c.type FROM Car c WHERE c.id NOT IN ("
+            + "  SELECT r.carId "
+            + "  FROM Reservation r "
+            + "  WHERE (:startDateInput BETWEEN r.startDate AND r.endDate) "
+            + "      OR (:endDateInput BETWEEN r.startDate AND r.endDate)"
+            + "  ) AND "
+            + "ORDER BY c.type.rentalPricePerDay asc"
+    ),
+       
     
 })
 
