@@ -1,5 +1,6 @@
 package session;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -41,17 +42,6 @@ public class CarRentalSession implements CarRentalSessionRemote {
     }
 
     @Override
-    public Quote createQuote(String company, ReservationConstraints constraints) throws ReservationException {
-        try {
-            Quote out = em.find(CarRentalCompany.class, company).createQuote(constraints, renter);
-            quotes.add(out);
-            return out;
-        } catch(Exception e) {
-            throw new ReservationException(e);
-        }
-    }
-
-    @Override
     public List<Quote> getCurrentQuotes() {
         return quotes;
     }
@@ -62,7 +52,9 @@ public class CarRentalSession implements CarRentalSessionRemote {
         List<Reservation> done = new LinkedList<Reservation>();
         try {
             for (Quote quote : quotes) {
-                done.add(em.find(CarRentalCompany.class, quote.getRentalCompany()).confirmQuote(quote));
+                Reservation res = em.find(CarRentalCompany.class, quote.getRentalCompany()).confirmQuote(quote);
+                this.em.persist(res);
+                done.add(res);  
             }
         } catch (Exception e) {
             for(Reservation r:done)
@@ -82,9 +74,76 @@ public class CarRentalSession implements CarRentalSessionRemote {
 
     @Override
     public String getCheapestCarType(Date start, Date end, String region) {
-        return em.createNamedQuery("getCheapestCarType")
+        List<CarRentalCompany> rentals = em.createNamedQuery("getAllCompaniesObjects").getResultList();
+        
+            if(region != null){
+                ArrayList<CarRentalCompany> rentalsInRegion = new ArrayList<CarRentalCompany>();
+        
+                for(CarRentalCompany company : rentals){
+                    if(company.getRegions().contains(region)) rentalsInRegion.add(company);
+                }
+                
+                rentals = rentalsInRegion;
+        }
+        
+        String query = 
+                "SELECT car.type.name " +
+                "FROM CarRentalCompany c, IN (c.cars) car " +
+                "WHERE car.id NOT IN (" +
+                "            SELECT r.carId " +
+                "            FROM Reservation r " +
+                "            WHERE (:startDateInput BETWEEN r.startDate AND r.endDate) " +
+                "            OR (:endDateInput BETWEEN r.startDate AND r.endDate)" +
+                "            ) AND (";
+        
+            boolean addOr = false;
+            for(CarRentalCompany rental : rentals){
+                
+                if(addOr) query += " OR ";
+                
+                query += ("c.name LIKE \"" + rental.getName() + "\"");
+                
+                addOr = true;
+            }
+            
+            if(region == null) query += " TRUE ";
+            
+            query += ") ORDER BY car.type.rentalPricePerDay asc"; 
+            
+        List<String> carTypeNames = em.createQuery(query)
                 .setParameter("startDateInput", start)
                 .setParameter("endDateInput", end)
                 .getResultList();
+        return carTypeNames.get(0);
+    }
+
+    @Override
+    public void createQuote(String renter, Date start, Date end, String carType, String region) throws ReservationException {
+        ReservationConstraints constraints = new ReservationConstraints(start, end, carType, region);
+        try {
+            List<CarRentalCompany> rentals = em.createNamedQuery("getAllCompaniesObjects").getResultList();
+        
+            for(CarRentalCompany company : rentals){
+                if(company.getRegions().contains(region)){
+                    
+                    List<String> result = em.createNamedQuery("getAvailableCarTypesForCompany")
+                            .setParameter("carTypeInput", carType)
+                            .setParameter("startDateInput", start)
+                            .setParameter("endDateInput", end)
+                            .setParameter("crcNameInput", company.getName())
+                            .getResultList();
+                    
+                    if(!result.isEmpty()) {
+                        Quote out = em.find(CarRentalCompany.class, company.getName()).createQuote(constraints, renter);
+                        quotes.add(out);
+                        return;
+                    }
+                }
+            }
+
+           throw new ReservationException("No available cars found for given constraints");
+        } catch(Exception e) {
+            throw new ReservationException(e);
+        }
     }
 }

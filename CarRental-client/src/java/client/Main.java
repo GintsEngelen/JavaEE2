@@ -23,7 +23,7 @@ public class Main extends AbstractTestManagement<CarRentalSessionRemote, Manager
         ms.persistRental("hertz.csv");
         ms.persistRental("dockx.csv");
         
-        //main.run();
+        main.run();
     }
 
     @Override
@@ -44,8 +44,6 @@ public class Main extends AbstractTestManagement<CarRentalSessionRemote, Manager
 
     @Override
     protected CarRentalSessionRemote getNewReservationSession(String name) throws Exception {
-        //PAY ATTENTION TO MEEEEEEEEE
-        //Where does the RentalSession come from? Do we need to add its name manually?
         InitialContext context = new InitialContext();
         return (CarRentalSessionRemote) context.lookup(CarRentalSessionRemote.class.getName());
     }
@@ -64,9 +62,8 @@ public class Main extends AbstractTestManagement<CarRentalSessionRemote, Manager
     }
 
     @Override
-    protected void createQuote(CarRentalSessionRemote session, String company, Date start, Date end, String carType, String region) throws Exception {
-        ReservationConstraints constraints = new ReservationConstraints(start, end, carType, region);
-        session.createQuote(company, constraints);
+    protected void createQuote(CarRentalSessionRemote session, String renter, Date start, Date end, String carType, String region) throws Exception {
+        session.createQuote(renter, start, end, carType, region);
     }
 
     @Override

@@ -18,26 +18,29 @@ import javax.persistence.OneToMany;
 @NamedQueries({
     @NamedQuery(name="getAllCompanies", query="SELECT c.name FROM CarRentalCompany c"),
     
+    @NamedQuery(name="getAllCompaniesObjects", query="Select crc FROM CarRentalCompany crc"),
+    
     @NamedQuery(name = "getAvailableCarTypes", query
             = "SELECT DISTINCT c.type FROM Car c WHERE c.id NOT IN ("
             + "  SELECT r.carId "
             + "  FROM Reservation r "
             + "  WHERE (:startDateInput BETWEEN r.startDate AND r.endDate) "
-            + "      OR (:endDateInput BETWEEN r.startDate AND r.endDate)"
+            + "      OR (:endDateInput BETWEEN r.startDate AND r.endDate) "
             + "  ) " 
     ),
     
-    @NamedQuery(name = "getCheapestCarType", query
-            = "SELECT c.type FROM Car c WHERE c.id NOT IN ("
+    @NamedQuery(name = "getAvailableCarTypesForCompany", query
+            = "SELECT DISTINCT c.type.name "
+            + "FROM CarRentalCompany crc, IN (crc.cars) c "
+            + " WHERE c.id NOT IN ("
             + "  SELECT r.carId "
             + "  FROM Reservation r "
             + "  WHERE (:startDateInput BETWEEN r.startDate AND r.endDate) "
-            + "      OR (:endDateInput BETWEEN r.startDate AND r.endDate)"
-            + "  ) AND "
-            + "ORDER BY c.type.rentalPricePerDay asc"
+            + "      OR (:endDateInput BETWEEN r.startDate AND r.endDate) "
+            + "  ) AND crc.name LIKE :crcNameInput"
+            + "    AND c.type.name LIKE :carTypeInput" 
     ),
-       
-    
+          
 })
 
 @Entity
