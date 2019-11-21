@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+import javax.ejb.EJBException;
 import javax.ejb.Stateful;
 import javax.ejb.TransactionAttribute;
 import javax.ejb.TransactionAttributeType;
@@ -57,9 +58,8 @@ public class CarRentalSession implements CarRentalSessionRemote {
                 done.add(res);  
             }
         } catch (Exception e) {
-            for(Reservation r:done)
-                em.find(CarRentalCompany.class, r.getRentalCompany()).cancelReservation(r);
-            throw new ReservationException(e);
+            System.out.println("ROLLBACK IN PROGRESS");
+            throw new EJBException(e);
         }
         return done;
     }

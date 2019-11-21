@@ -40,7 +40,50 @@ import javax.persistence.OneToMany;
             + "  ) AND crc.name LIKE :crcNameInput"
             + "    AND c.type.name LIKE :carTypeInput" 
     ),
+    
+    @NamedQuery(name = "getNumberOfReservations", query
+            = "SELECT COUNT(r.reservationId) " +
+               "FROM Reservation r " +
+               "GROUP BY r.carRenter " + 
+               "ORDER BY 1 DESC "
+    ),
+    
+    @NamedQuery(name = "getClientsForNumberOfReservations", query
+            = "SELECT r.carRenter "
+            + "FROM Reservation r "
+            + "GROUP BY r.carRenter "
+            + "HAVING COUNT(r.reservationId) = :maxReservations"
+    ),
+        
+    @NamedQuery(name = "getNumberOfReservationsForCompany", query
+            ="SELECT COUNT(r.reservationId) "
+            + "FROM Reservation r "
+            + "WHERE r.rentalCompany LIKE :rentalCompanyInput AND EXTRACT(YEAR FROM r.startDate) = :yearInput "
+            + "GROUP BY r.carType "
+            + "ORDER BY 1 DESC"
+    ),
+    
+    @NamedQuery(name = "getCarTypeForNumberOfReservationsForCompany", query
+            = "SELECT r.carType "
+            + "FROM Reservation r "
+            + "WHERE r.rentalCompany LIKE :rentalCompanyInput AND EXTRACT(YEAR FROM r.startDate) = :yearInput "
+            + "GROUP BY r.carType "
+            + "HAVING COUNT(r.reservationId) = :maxReservations "
+    ),
           
+    @NamedQuery(name= "getNumberOfReservationsByClient", query
+            = "SELECT COUNT(r.reservationId) " + 
+                "FROM Reservation r " +
+                "WHERE r.carRenter LIKE :carRenterInput " +
+                "GROUP BY r.carRenter "
+    ),
+    
+    @NamedQuery(name = "getNumberOfReservationsForCarType", query
+            = "Select Count(r.reservationId) "
+            + "FROM Reservation r "
+            + "WHERE r.rentalCompany LIKE :rentalCompanyInput AND r.carType LIKE :carTypeInput "
+            + "GROUP BY r.carType"
+    ),
 })
 
 @Entity

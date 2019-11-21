@@ -130,6 +130,61 @@ public class ManagerSession implements ManagerSessionRemote {
 
         return out;
     }
+
+    @Override
+    public Set<String> getBestClients() {
+        // JDBC Does not allow subquery in FROM clause
+        Long maxReservations = (Long) em.createNamedQuery("getNumberOfReservations").getResultList().get(0);
+        
+        return new HashSet<String>(em.createNamedQuery("getClientsForNumberOfReservations")
+                .setParameter("maxReservations", maxReservations)
+                .getResultList());
+    }
+
+    @Override
+    public CarType getMostPopularCarTypeIn(String carRentalCompanyName, int year) {
+        Long maxReservations = (Long) em.createNamedQuery("getNumberOfReservationsForCompany")
+                .setParameter("rentalCompanyInput", carRentalCompanyName)
+                .setParameter("yearInput", year)
+                .getResultList().get(0);
+        
+        String carTypeString = (String) em.createNamedQuery("getCarTypeForNumberOfReservationsForCompany")
+                .setParameter("rentalCompanyInput", carRentalCompanyName)
+                .setParameter("yearInput", year)
+                .setParameter("maxReservations", maxReservations)
+                .getResultList().get(0);
+        
+       int carTypeId = (int) em.createQuery("SELECT t.id "
+                                              + "FROM CarRentalCompany crc, IN (crc.carTypes) t "
+                                              + "WHERE crc.name LIKE :rentalCompanyInput AND t.name LIKE :carTypeInput")
+               .setParameter("rentalCompanyInput", carRentalCompanyName)
+               .setParameter("carTypeInput", carTypeString)
+               .getResultList().get(0);
+              
+        return em.find(CarType.class, carTypeId);
+    }
+
+    @Override
+    public int getNumberOfReservationsBy(String clientName) {
+         List<Long> resultList = em.createNamedQuery("getNumberOfReservationsByClient")
+                .setParameter("carRenterInput", clientName)
+                .getResultList();
+        
+         
+        if(resultList.isEmpty()) return 0;
+        return Math.toIntExact(resultList.get(0));
+    }
+
+    @Override
+    public int getNumberOfReservationsForCarType(String carRentalName, String carType) {
+        List<Long> resultList = em.createNamedQuery("getNumberOfReservationsForCarType")
+                .setParameter("rentalCompanyInput", carRentalName)
+                .setParameter("carTypeInput", carType)
+                .getResultList();
+        
+        if(resultList.isEmpty()) return 0;
+        return Math.toIntExact(resultList.get(0));
+    }
     
     static class CrcData {
             public List<Car> cars = new LinkedList<Car>();
