@@ -3,6 +3,7 @@ package rental;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
+import static javax.persistence.CascadeType.ALL;
 import static javax.persistence.CascadeType.REMOVE;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -21,7 +22,7 @@ public class Car {
     @ManyToOne
     private CarType type;
     
-    @OneToMany(cascade=REMOVE)
+    @OneToMany(cascade=ALL)
     private Set<Reservation> reservations;
 
     /***************

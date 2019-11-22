@@ -13,6 +13,7 @@ import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.annotation.security.RolesAllowed;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -27,6 +28,7 @@ public class ManagerSession implements ManagerSessionRemote {
 @PersistenceContext EntityManager em;    
     
     @Override
+    @RolesAllowed("Manager")
     public Set<CarType> getCarTypes(String company) {
         try {
             return new HashSet<CarType>(em.find(CarRentalCompany.class, company).getAllTypes());
@@ -37,6 +39,7 @@ public class ManagerSession implements ManagerSessionRemote {
     }
 
     @Override
+    @RolesAllowed("Manager")
     public Set<Integer> getCarIds(String company, String type) {
         Set<Integer> out = new HashSet<Integer>();
         try {
@@ -51,6 +54,7 @@ public class ManagerSession implements ManagerSessionRemote {
     }
 
     @Override
+    @RolesAllowed("Manager")
     public int getNumberOfReservations(String company, String type, int id) {
         try {
             return em.find(CarRentalCompany.class, company).getCar(id).getReservations().size();
@@ -61,6 +65,7 @@ public class ManagerSession implements ManagerSessionRemote {
     }
 
     @Override
+    @RolesAllowed("Manager")
     public int getNumberOfReservations(String company, String type) {
         Set<Reservation> out = new HashSet<Reservation>();
         try {
@@ -75,6 +80,7 @@ public class ManagerSession implements ManagerSessionRemote {
     }
 
     @Override
+    @RolesAllowed("Manager")
     public void persistRental(String datafile) {
         // Should the csv be stored locally, or at the server side? 
         try {
@@ -132,6 +138,7 @@ public class ManagerSession implements ManagerSessionRemote {
     }
 
     @Override
+    @RolesAllowed("Manager")
     public Set<String> getBestClients() {
         // JDBC Does not allow subquery in FROM clause
         Long maxReservations = (Long) em.createNamedQuery("getNumberOfReservations").getResultList().get(0);
@@ -142,6 +149,7 @@ public class ManagerSession implements ManagerSessionRemote {
     }
 
     @Override
+    @RolesAllowed("Manager")
     public CarType getMostPopularCarTypeIn(String carRentalCompanyName, int year) {
         Long maxReservations = (Long) em.createNamedQuery("getNumberOfReservationsForCompany")
                 .setParameter("rentalCompanyInput", carRentalCompanyName)
@@ -176,6 +184,7 @@ public class ManagerSession implements ManagerSessionRemote {
     }
 
     @Override
+    @RolesAllowed("Manager")
     public int getNumberOfReservationsForCarType(String carRentalName, String carType) {
         List<Long> resultList = em.createNamedQuery("getNumberOfReservationsForCarType")
                 .setParameter("rentalCompanyInput", carRentalName)
